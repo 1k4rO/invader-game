@@ -3,6 +3,7 @@ import pygame
 
 from settings import Settings
 from ship import Ship
+from bullet import Bullet
 
 # Clase general para el manejo del juego
 class InvaderGame:
@@ -24,6 +25,8 @@ class InvaderGame:
         #Titulo del juego
         pygame.display.set_caption("Invader Game")
         self.ship = Ship(self)
+        #Grupo para todas las balas activas
+        self.bullets = pygame.sprite.Group()
         
 
 
@@ -33,9 +36,16 @@ class InvaderGame:
         while True:
             self._check_events()
             self.ship.update()
+            self._update_bullets()
             self._update_screen()
             self.clock.tick(60)
 
+
+    def _update_bullets(self):
+        self.bullets.update()
+        for bullet in self.bullets.copy():
+                if bullet.rect.bottom <= 0:
+                    self.bullets.remove(bullet)
 
     def _check_events(self):
         for event in pygame.event.get():
@@ -54,6 +64,8 @@ class InvaderGame:
             self.ship.moving_left = True
         elif event.key == pygame.K_q:
             sys.exit()
+        elif event.key == pygame.K_SPACE:
+            self._fire_bullet()
 
     def _check_keyup_events(self,event):
         if event.key == pygame.K_RIGHT:
@@ -64,11 +76,21 @@ class InvaderGame:
     def _update_screen(self):
         #Cambia el fondo de pantalla por el color que haya en la clase Settings
         self.screen.fill(self.settings.bg_color)
+
+        #Dibuja en cada ciclo las balas
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+
         #Dibuja la nave espacial
         self.ship.blitme()
         #Actualiza la pantalla con las modificaciones más recientes
         pygame.display.flip()
 
+    def _fire_bullet(self):
+        #Crea una nueva bala en la posición de la nave
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
 
 if __name__ == '__main__':
     #Crea una instancia y ejecuta el juego
