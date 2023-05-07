@@ -1,9 +1,9 @@
 import sys
 import pygame
 
-from settings import Settings
-from ship import Ship
-from bullet import Bullet
+from game.settings import Settings
+from game.ship import Ship
+from game.bullet import Bullet
 
 # Clase general para el manejo del juego
 class InvaderGame:
