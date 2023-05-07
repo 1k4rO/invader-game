@@ -4,6 +4,7 @@ import pygame
 from game.settings import Settings
 from game.ship import Ship
 from game.bullet import Bullet
+from game.alien import Alien
 
 # Clase general para el manejo del juego
 class InvaderGame:
@@ -27,6 +28,9 @@ class InvaderGame:
         self.ship = Ship(self)
         #Grupo para todas las balas activas
         self.bullets = pygame.sprite.Group()
+        #Grupo para los aliens que están en pantalla
+        self.aliens = pygame.sprite.Group()
+        self._create_fleet()
         
 
 
@@ -83,6 +87,9 @@ class InvaderGame:
 
         #Dibuja la nave espacial
         self.ship.blitme()
+        
+
+        self.aliens.draw(self.screen)
         #Actualiza la pantalla con las modificaciones más recientes
         pygame.display.flip()
 
@@ -91,6 +98,33 @@ class InvaderGame:
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
+    
+    def _create_fleet(self):
+        """Crea todos los aliens"""
+        alien = Alien(self)
+        alien_width, alien_height = alien.rect.size
+
+        current_x, current_y = alien_width, alien_height
+        count=0
+        while current_y < (self.settings.screen_height/2):
+            
+            while current_x < (self.settings.screen_width -3 * alien_width):
+                self._create_alien(current_x, current_y)
+                current_x += 3*alien_width
+            if(count%2==1):
+                current_x = 1.5*alien_width
+            else:
+                current_x = 0
+            count += 1
+            current_y += 2*alien_height
+
+    def _create_alien(self, x_position, y_position):
+        """Crea un solo alien"""
+        new_alien = Alien(self)
+        new_alien.x = x_position
+        new_alien.rect.x = x_position
+        new_alien.rect.y = y_position
+        self.aliens.add(new_alien)
 
 if __name__ == '__main__':
     #Crea una instancia y ejecuta el juego
